@@ -1,6 +1,5 @@
-# Makefile
-
 # 定义编译器
+CXX = g++
 NVCC = nvcc
 
 # 定义编译选项
@@ -14,23 +13,23 @@ LDFLAGS = -L/usr/local/cuda/lib64 -lcudart
 TARGET = main.out
 
 # 定义源文件和目标文件
-SRC = main.cpp kmeans.cpp cuda_func.cu kmeansGPU.cpp
-OBJ = main.o kmeans.o kmeansGPU.o cuda_func.o
+SRC = main.cpp kmeans.cpp kmeansGPU.cu
+OBJ = main.o kmeans.o kmeansGPU.o
 
 # 定义默认目标
 all: clean $(TARGET)
 
-# 定义目标文件的构建规则
+# 使用 nvcc 进行链接，确保处理 CUDA 库
 $(TARGET): $(OBJ)
 	$(NVCC) $(NVCCFLAGS) $(LDFLAGS) -o $@ $^
 
 # 定义对象文件的构建规则
 %.o: %.cpp
-	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.cu
 	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
-# 清理规则
+# 定义清理规则
 clean:
 	rm -f $(OBJ) $(TARGET)
