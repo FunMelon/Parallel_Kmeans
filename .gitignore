@@ -1,0 +1,5 @@
+*.o
+*.csv
+.idea
+.vscode
+*.out
