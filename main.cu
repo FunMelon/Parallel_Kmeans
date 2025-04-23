@@ -45,23 +45,24 @@ void readCoordinate(float* data, int* label, const int n_features, int& n) {
     ifs.close();
 }
 
+// timing 函数用于测量 KMeans 聚类算法的运行时间
 void timing(
-    float* data,
-    int* label,
-    float* clusters,
-    const int numClusters,
-    const int n_features,
-    const int n_samples,
-    const int method) {
+    float* data,            // 指向浮点数数组的指针，用于存储读取的特征数据
+    int* label,             // 指向整型数组的指针，用于存储读取的标签数据
+    float* clusters,        // 存储初始聚类中心的数组
+    const int numClusters,  // 聚类中心数量
+    const int n_features,   // 特征数量
+    const int n_samples,    // 样本数量
+    const int method        // 方法选择，0表示CPU，1表示GPU
+) {
 
     Kmeans* model;
 
-    switch (method)
-    {
-    case 0:
+    switch (method) {
+    case 0: // CPU
         model = new Kmeans(numClusters, n_features, clusters, n_samples, 50, 0.1);
         break;
-    case 1:
+    case 1: // GPU
         model = new KmeansGPU(numClusters, n_features, clusters, n_samples, 50, 0.1);
         break;
     default:
@@ -71,7 +72,7 @@ void timing(
 
     std::cout << "*********starting fitting*********" << std::endl;
 
-    cudaEvent_t start, stop;
+    cudaEvent_t start, stop;    // CUDA事件，用于测量时间
     CHECK(cudaEventCreate(&start));
     CHECK(cudaEventCreate(&stop));
     CHECK(cudaEventRecord(start));
@@ -98,23 +99,22 @@ void timing(
 }
 
 int main(int argc, char* argv[]) {
-    int N = 0;
-    int n_features = 100;
-    const int bufferSize = 10000 * n_features;
-    float* data = new float[bufferSize];
-    int* label = new int[bufferSize];
-    readCoordinate(data, label, n_features, N);
+    int N = 0;  // 样本数量
+    int n_features = 100;   // 特征数量
+    const int bufferSize = 10000 * n_features;  // 缓冲区大小
+    float* data = new float[bufferSize];    // 指向浮点数数组的指针，用于存储读取的特征数据
+    int* label = new int[bufferSize];       // 指向整型数组的指针，用于存储读取的标签数据
+    readCoordinate(data, label, n_features, N); // 读取数据集
     std::cout << "num of samples : " << N << std::endl;
-    int cidx[] = { 1, 3, 6, 8 };
-    int numClusters = 4;
-    float clusters[400] = { 0 };
-    for (int i = 0; i < numClusters; ++i) {
+    int cidx[] = { 1, 3, 6, 8 };    // 选择的初始聚类中心的索引
+    int numClusters = 4;    // 聚类中心数量
+    float clusters[400] = { 0 };    // 存储初始聚类中心的数组
+    for (int i = 0; i < numClusters; ++i) { // 将初始聚类中心的坐标从数据集中复制到 clusters 数组中
         for (int j = 0; j < n_features; ++j) {
             clusters[i * n_features + j] = data[cidx[i] * n_features + j];
         }
     }
     std::cout << "********* init clusters **********" << std::endl;
-    // printVecInVec<float>(clusters, 4, 100, "clusters");
     std::cout << "Using CPU:" << std::endl;
     timing(data, label, clusters, numClusters, n_features, N, 0);
     std::cout << "Using CUDA:" << std::endl;
