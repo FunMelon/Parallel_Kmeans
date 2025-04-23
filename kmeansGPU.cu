@@ -142,19 +142,6 @@ __global__ void reduceSum(
         d_loss[blockIdx.x] = s_y[0];
 }
 
-// 统计每个聚类（cluster）中被分配了多少个样本
-__global__ void countCluster(
-    int* d_sampleClasses,   // [nsamples, ]，每个样本对应的类编号
-    int* d_clusterSize,     // [numClusters, ]，每个类的样本数量
-    int nsamples            // 样本数量
-) {
-    int n = threadIdx.x + blockDim.x * blockIdx.x;
-    if (n < nsamples) {
-        int clusterID = d_sampleClasses[n];  // 每个样本对应的类编号
-        atomicAdd(&(d_clusterSize[clusterID]), 1);  // 原子操作，避免数据竞争
-    }
-}
-
 // 将所有样本的特征值加到其对应的聚类中心上，并求平均，更新聚类中心的位置
 __global__ void update(
     const float* d_data,    // [nsamples, numFeatures]，样本数据
@@ -173,6 +160,37 @@ __global__ void update(
     }
 }
 
+// 统计每个聚类（cluster）中被分配了多少个样本
+__global__ void countCluster(
+    int* d_sampleClasses,   // [nsamples, ]，每个样本对应的类编号
+    int* d_clusterSize,     // [numClusters, ]，每个类的样本数量
+    int nsamples            // 样本数量
+) {
+    int n = threadIdx.x + blockDim.x * blockIdx.x;
+    if (n < nsamples) {
+        int clusterID = d_sampleClasses[n];  // 每个样本对应的类编号
+        atomicAdd(&(d_clusterSize[clusterID]), 1);  // 原子操作，避免数据竞争
+    }
+}
+
+// 用于在 CPU 上统计每个聚类（cluster）中被分配了多少个样本
+void countClusterHost(
+    int* h_sampleClasses,   // [nsamples, ]，每个样本对应的类编号
+    int* h_clusterSize,     // [numClusters, ]，每个类的样本数量
+    int nsamples,           // 样本数量
+    int numClusters         // 类的数量
+) {
+    // 初始化 h_clusterSize 为 0
+    std::fill(h_clusterSize, h_clusterSize + numClusters, 0);
+
+    for (int n = 0; n < nsamples; ++n) {
+        int clusterID = h_sampleClasses[n];  // 每个样本对应的类编号
+        if (clusterID >= 0 && clusterID < numClusters) {
+            h_clusterSize[clusterID]++;  // 更新计数
+        }
+    }
+}
+
 // 根据当前样本的分配情况，重新计算并更新每个聚类中心的位置（即均值）
 void updateClusterWithCuda(
     const float* d_data,    // [nsamples, numFeatures]，样本数据
@@ -186,8 +204,18 @@ void updateClusterWithCuda(
     init<float> << <1, 1024 >> > (d_clusters, 0.0, numClusters * numFeatures);  // 初始化类中心点坐标，启动一个线程块，大小为1024
     int blockSize = 1024;   // 线程块的大小
     int gridSize = (nsamples - 1) / blockSize + 1;  // 计算网格大小，确保覆盖所有样本
-    countCluster << <gridSize, blockSize >> > (d_sampleClasses, d_clusterSize,
-        nsamples);  // 统计每个聚类中被分配了多少个样本
+
+    // *******************在CPU上统计聚类***************************
+    // int* h_sampleClasses = new int[nsamples];
+    // cudaMemcpy(h_sampleClasses, d_sampleClasses, nsamples * sizeof(int), cudaMemcpyDeviceToHost); // 从 GPU 将样本分类信息拷贝到 CPU
+    // int* h_clusterSize = new int[numClusters];
+    // countClusterHost(h_sampleClasses, h_clusterSize, nsamples, numClusters);  // 在 CPU 上统计每个聚类的样本数量
+    // cudaMemcpy(d_clusterSize, h_clusterSize, numClusters * sizeof(int), cudaMemcpyHostToDevice);  // 将聚类大小从 CPU 拷贝回 GPU
+
+    // ********************在GPU上统计聚类**********************
+    countCluster << <gridSize, blockSize >> > (d_sampleClasses, d_clusterSize, nsamples);  // 统计每个聚类中被分配了多少个样本
+    // *****************************************************
+
     update << <nsamples, 128 >> > (d_data, d_clusters, d_sampleClasses,
         d_clusterSize, nsamples, numFeatures);  // 更新聚类中心的位置
 }
