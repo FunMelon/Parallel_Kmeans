@@ -22,9 +22,9 @@ KmeansGPU::KmeansGPU(
     float* clusters,    // [numClusters, numFeatures]，类中心点坐标
     int nsamples,       // 样本数量
     int maxIters,       // 最大迭代次数
-    float eplison       // 迭代停止条件（损失函数的变化小于该值时停止迭代）
+    float epsilon       // 迭代停止条件（损失函数的变化小于该值时停止迭代）
 )
-    : Kmeans(numClusters, numFeatures, clusters, nsamples, maxIters, eplison) {
+    : Kmeans(numClusters, numFeatures, clusters, nsamples, maxIters, epsilon) {
 }
 
 // 模板：将数组x的前N个元素初始化为value
@@ -269,7 +269,7 @@ void KmeansGPU::fit(const float* v_data) {
         this->updateClusters(d_data);   // 更新聚类中心
         CHECK(cudaMemcpy(h_loss, d_loss, sampleClassmem, cudaMemcpyDeviceToHost));  // 将损失从设备端复制到主机端
         this->m_optTarget = h_loss[0];  // 获取损失值
-        if (std::abs(lastLoss - this->m_optTarget) < this->m_eplison)   // 判断是否收敛
+        if (std::abs(lastLoss - this->m_optTarget) < this->m_epsilon)   // 判断是否收敛
             break;
         lastLoss = this->m_optTarget;   // 更新上次损失值
         std::cout << "Iters: " << i + 1 << "  current loss : " << m_optTarget << std::endl;

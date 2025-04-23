@@ -9,7 +9,7 @@ public:
         float* clusters,
         int nsamples,
         int maxIters,
-        float eplison);
+        float epsilon);
     virtual ~Kmeans();
     virtual void getDistance(const float* v_data);
     virtual void updateClusters(const float* v_data);
@@ -26,7 +26,7 @@ public:
     int m_nsamples;     // 样本数量
     float m_optTarget;  // 优化目标值，即loss
     int m_maxIters;     // 最大迭代次数
-    float m_eplison;    // 目标阈值，两次loss相差超过该值停止迭代
+    float m_epsilon;    // 目标阈值，两次loss相差超过该值停止迭代
     float* m_distances; // [nsamples, numClusters]，用于存储每个样本到每个类的中心两两之间的距离
     int* m_sampleClasses; // [nsamples, ]，记录每个样本的类比编号
 

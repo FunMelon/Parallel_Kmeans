@@ -11,7 +11,7 @@ public:
         float* clusters,
         int nsamples,
         int maxIters,
-        float eplison);
+        float epsilon);
     virtual void getDistance(const float* d_data);
     virtual void updateClusters(const float* d_data);
     virtual void fit(const float* v_data);

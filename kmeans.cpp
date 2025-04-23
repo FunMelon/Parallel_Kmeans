@@ -17,7 +17,7 @@ Kmeans::Kmeans(int numClusters, int numFeatures, float* clusters, int nsamples)
     m_nsamples(nsamples),
     m_optTarget(1e7),
     m_maxIters(50),
-    m_eplison(0.001),
+    m_epsilon(0.001),
     m_distances(new float[nsamples * numClusters] {0.0}),
     m_sampleClasses(new int[nsamples] {0}) {
     for (int i = 0; i < numClusters * numFeatures; ++i) {
@@ -28,20 +28,20 @@ Kmeans::Kmeans(int numClusters, int numFeatures, float* clusters, int nsamples)
 // 详细的构造函数
 // ...
 // maxIterszx: 最大迭代此时
-// eplison: 目标阈值
+// epsilon: 目标阈值
 Kmeans::Kmeans(int numClusters,
     int numFeatures,
     float* clusters,
     int nsamples,
     int maxIters,
-    float eplison)
+    float epsilon)
     : m_numClusters(numClusters),
     m_numFeatures(numFeatures),
     m_clusters(new float[numClusters * numFeatures]),
     m_nsamples(nsamples),
     m_optTarget(1e7),
     m_maxIters(maxIters),
-    m_eplison(eplison),
+    m_epsilon(epsilon),
     m_distances(new float[nsamples * numClusters] {0.0}),
     m_sampleClasses(new int[nsamples] {0}) {
     for (int i = 0; i < numClusters * numFeatures; ++i) {
@@ -173,7 +173,7 @@ void Kmeans::fit(const float* v_data) {
     for (int i = 0; i < m_maxIters; ++i) {
         this->getDistance(v_data);
         this->updateClusters(v_data);
-        if (std::abs(lastLoss - this->m_optTarget) < this->m_eplison)
+        if (std::abs(lastLoss - this->m_optTarget) < this->m_epsilon)
             break;
         lastLoss = this->m_optTarget;
         std::cout << "Iters: " << i + 1 << "  current loss : " << m_optTarget
