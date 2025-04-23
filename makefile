@@ -13,7 +13,7 @@ LDFLAGS = -L/usr/local/cuda/lib64 -lcudart
 TARGET = main.out
 
 # 定义源文件和目标文件
-SRC = main.cpp kmeans.cpp kmeansGPU.cu
+SRC = main.cu kmeans.cpp kmeansGPU.cu
 OBJ = main.o kmeans.o kmeansGPU.o
 
 # 定义默认目标
@@ -32,4 +32,4 @@ $(TARGET): $(OBJ)
 
 # 定义清理规则
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -f $(OBJ) $(TARGET) cluster_labels_cpp.csv cluster_labels_parallel_cpp.csv
