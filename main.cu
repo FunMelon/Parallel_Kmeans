@@ -228,9 +228,9 @@ int main(int argc, char* argv[]) {
     int *cidx = new int[numClusters]; // 动态分配内存以存储初始聚类中心的索引
     randomInit(clusters, numClusters, cidx, n_samples); // 随机初始化聚类中心
 
-    for (int i = 0; i < numClusters; ++i) {  // 选择的初始聚类中心的索引
-        cidx[i] = i;  // 默认使用样本索引 0, 1, 2, ..., numClusters-1
-    }
+    // for (int i = 0; i < numClusters; ++i) {  // 选择的初始聚类中心的索引
+    //     cidx[i] = i;  // 默认使用样本索引 0, 1, 2, ..., numClusters-1
+    // }
 
     float* data = new float[bufferSize];    // 指向浮点数数组的指针，用于存储读取的特征数据
     int* label = new int[bufferSize];       // 指向整型数组的指针，用于存储读取的标签数据
@@ -240,6 +240,7 @@ int main(int argc, char* argv[]) {
             clusters[i * n_features + j] = data[cidx[i] * n_features + j];
         }
     }
+    delete[] cidx;
     std::cout << "********* init clusters **********" << std::endl;
     std::cout << "Using CPU:" << std::endl;
     timing(data, label, clusters, numClusters, n_features, n_samples, m_maxIters, m_epsilon, 0); // 使用 CPU 进行 KMeans 聚类
@@ -249,7 +250,6 @@ int main(int argc, char* argv[]) {
     delete[] data;
     delete[] label;
     delete[] clusters;
-    delete[] cidx;
 
     return 0;
 }
