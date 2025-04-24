@@ -1,7 +1,7 @@
 #include <cuda_runtime.h>
 #include <cmath>
 #include <iostream>
-#include "MACRO.h"
+#include "error.cuh"
 #include "helper_cuda.h"
 #include "kmeansGPU.h"
 

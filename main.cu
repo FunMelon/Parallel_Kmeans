@@ -5,7 +5,7 @@
 #include <string>
 #include "kmeans.h"
 #include "kmeansGPU.h"
-#include "MACRO.h"
+#include "error.cuh"
 
 // 读取合成数据集，并将所有数据放到一个一维数组中
 // data: 指向浮点数数组的指针，用于存储读取的特征数据
