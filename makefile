@@ -2,7 +2,7 @@
 NVCC = nvcc
 
 # 定义编译选项
-NVCCFLAGS = -arch=sm_75 -std=c++11 -I/home/funmelon/cuda-samples/Common -I/usr/local/cuda/include
+NVCCFLAGS = -arch=sm_75 -std=c++17 -I/home/funmelon/cuda-samples/Common -I/usr/local/cuda/include
 
 # 定义链接选项
 LDFLAGS = -L/usr/local/cuda/lib64 -lcudart
