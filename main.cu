@@ -160,39 +160,41 @@ void timing(
     std::cout << "*********    result saving done   **********" << std::endl;
     delete model;
 }
-// 随机初始化聚类中心
+
 void randomInit(
-    float* data,        // 数据集
+    float* data,        // 数据集（其实用不到 data）
     int numClusters,    // 聚类中心数量
-    int* centers,       // 存储初始聚类中心的数组
+    int* centers,       // 存储初始聚类中心的索引
     int n_samples       // 样本数量
 ) {
-    // 设置随机种子
     std::srand(std::time(0));
 
-    // 确保 numClusters 不超过数据点数量
     if (numClusters > n_samples) {
         std::cerr << "Error: Number of clusters exceeds the number of data points." << std::endl;
         return;
     }
 
-    // 创建一个随机索引的列表，用于选择初始聚类中心
+    // 创建并打乱索引数组
     int* indices = new int[n_samples];
     for (int i = 0; i < n_samples; ++i) {
         indices[i] = i;
     }
-    // 对索引列表进行随机洗牌
     for (int i = n_samples - 1; i > 0; --i) {
         int j = std::rand() % (i + 1);
         std::swap(indices[i], indices[j]);
     }
 
-    // 选择前 numClusters 个随机索引作为初始聚类中心
+    // 选前 numClusters 个索引作为初始聚类中心索引
     for (int i = 0; i < numClusters; ++i) {
-        centers[i] = data[indices[i]];
+        centers[i] = indices[i];
     }
 
-    delete[] indices; // 释放动态分配的内存
+    delete[] indices;
+
+    std::cout << "********* random init cluster indices **********" << std::endl;
+    for (int i = 0; i < numClusters; ++i) {
+        std::cout << "center[" << i << "] = sample index " << centers[i] << std::endl;
+    }
 }
 
 int main(int argc, char* argv[]) {
