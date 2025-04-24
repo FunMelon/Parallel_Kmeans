@@ -1,10 +1,8 @@
 # 定义编译器
-CXX = g++
 NVCC = nvcc
 
 # 定义编译选项
-CXXFLAGS = -Wall -std=c++11
-NVCCFLAGS = -arch=sm_52 -std=c++11 -I/home/funmelon/cuda-samples/Common -I/usr/local/cuda/include
+NVCCFLAGS = -arch=sm_75 -std=c++11 -I/home/funmelon/cuda-samples/Common -I/usr/local/cuda/include
 
 # 定义链接选项
 LDFLAGS = -L/usr/local/cuda/lib64 -lcudart
@@ -25,7 +23,7 @@ $(TARGET): $(OBJ)
 
 # 定义对象文件的构建规则
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
 %.o: %.cu
 	$(NVCC) $(NVCCFLAGS) -c $< -o $@
