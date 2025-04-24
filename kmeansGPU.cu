@@ -174,22 +174,22 @@ __global__ void countCluster(
 }
 
 // 用于在 CPU 上统计每个聚类（cluster）中被分配了多少个样本
-void countClusterHost(
-    int* h_sampleClasses,   // [nsamples, ]，每个样本对应的类编号
-    int* h_clusterSize,     // [numClusters, ]，每个类的样本数量
-    int nsamples,           // 样本数量
-    int numClusters         // 类的数量
-) {
-    // 初始化 h_clusterSize 为 0
-    std::fill(h_clusterSize, h_clusterSize + numClusters, 0);
+// void countClusterHost(
+//     int* h_sampleClasses,   // [nsamples, ]，每个样本对应的类编号
+//     int* h_clusterSize,     // [numClusters, ]，每个类的样本数量
+//     int nsamples,           // 样本数量
+//     int numClusters         // 类的数量
+// ) {
+//     // 初始化 h_clusterSize 为 0
+//     std::fill(h_clusterSize, h_clusterSize + numClusters, 0);
 
-    for (int n = 0; n < nsamples; ++n) {
-        int clusterID = h_sampleClasses[n];  // 每个样本对应的类编号
-        if (clusterID >= 0 && clusterID < numClusters) {
-            h_clusterSize[clusterID]++;  // 更新计数
-        }
-    }
-}
+//     for (int n = 0; n < nsamples; ++n) {
+//         int clusterID = h_sampleClasses[n];  // 每个样本对应的类编号
+//         if (clusterID >= 0 && clusterID < numClusters) {
+//             h_clusterSize[clusterID]++;  // 更新计数
+//         }
+//     }
+// }
 
 // 根据当前样本的分配情况，重新计算并更新每个聚类中心的位置（即均值）
 void updateClusterWithCuda(
