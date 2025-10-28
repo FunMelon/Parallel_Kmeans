@@ -19,14 +19,16 @@ public:
     virtual const char* getLabelFileName() const {
         return "cluster_labels_cpp.csv";
     }
-
-    int m_numClusters;  // 类别数量，即k
-    int m_numFeatures;  // 特征数量
-    float* m_clusters;  // [numClusters, numFeatures]，存储当前各个类的中心点坐标
+    // 样本配置
     int m_nsamples;     // 样本数量
+    int m_numFeatures;  // 特征数量
+    // 训练参数
+    int m_numClusters;  // 类别数量，即k
     float m_optTarget;  // 优化目标值，即loss
     int m_maxIters;     // 最大迭代次数
     float m_epsilon;    // 目标阈值，两次loss相差超过该值停止迭代
+    // 中间变量
+    float* m_clusters;  // [numClusters, numFeatures]，存储当前各个类的中心点坐标
     float* m_distances; // [nsamples, numClusters]，用于存储每个样本到每个类的中心两两之间的距离
     int* m_sampleClasses; // [nsamples, ]，记录每个样本的类比编号
 
