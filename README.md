@@ -13,6 +13,15 @@ make
   - 使用sklearn第三方库的python代码
   - 并行的C++代码
 - 结果可视化代码
+## 并行的粒度
+| 阶段 | 并行维度 |
+| ---- | ---- |
+| 距离计算 | 聚类（stream）x样本×特征 | 
+| 样本分类 + 类别统计 | 样本 |
+| 损失计算 | 层次规约 |
+| 特征累加 | 样本x维度 |
+| 聚类中心更新 | 聚类x维度|
+
 ## 运行代码
 ```shell
  ./main.out --filename ./synthetic_datast.csv --numClusters 4 --maxIters 50 --epsilon 0.01 
